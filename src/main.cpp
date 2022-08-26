@@ -19,8 +19,6 @@ MCUFRIEND_kbv tft;
 void setup()
 {
   // put your setup code here, to run once:
-  pinMode(25, OUTPUT);
-  digitalWrite(25, HIGH);
   Serial.begin(9600);
   pinMode(Bttn, INPUT_PULLUP);
   // Reading TFT ID:

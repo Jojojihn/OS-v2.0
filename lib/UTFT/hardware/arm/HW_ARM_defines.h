@@ -9,7 +9,7 @@
 // ElecHouse TFT LCD/SD Shield for Arduino Due
 // -------------------------------------
 // Uncomment the following line if you are using this shield
-//#define EHOUSE_DUE_SHIELD 1
+#define EHOUSE_DUE_SHIELD 1
 //
 // For this shield: RS=22, WR=23, CS=31, RST=33
 //********************************************************************

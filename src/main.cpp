@@ -1,29 +1,38 @@
 #include <Arduino.h>
-#include "UTFT.h"
+#include <Adafruit_GFX.h>
+#include <MCUFRIEND_kbv.h>
 
 #define VrX A7
 #define VrY A6
 #define Bttn 22
+#define BLACK 0x0000
+#define BLUE 0x001F
+#define RED 0xF800
+#define GREEN 0x07E0
+#define CYAN 0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW 0xFFE0
+#define WHITE 0xFFFF
 
+MCUFRIEND_kbv tft;
 
-extern uint8_t BigFont[];
-//Uncomment the next line for Arduino Mega
-UTFT tftDisplay(ILI9486,A2,A1,A3,A4);   // Remember to change the model parameter to suit your display module!
-
-
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
-  
+  pinMode(25, OUTPUT);
+  digitalWrite(25, HIGH);
   Serial.begin(9600);
   pinMode(Bttn, INPUT_PULLUP);
-
-  tftDisplay.InitLCD();
-  tftDisplay.clrScr();
-  tftDisplay.setFont(BigFont);
-
+  // Reading TFT ID:
+  uint16_t ID = tft.readID();
+  // Initializing TFT display:
+  tft.begin(ID);
+  // Fill TFT Screen with a color:
+  tft.fillScreen(BLACK);
 }
 
-void loop() {
+void loop()
+{
   int vals[2];
 
   vals[0] = analogRead(VrX);
@@ -39,19 +48,8 @@ void loop() {
 
   bool button = (digitalRead(Bttn) == LOW);
 
-  if(button) {
+  if (button)
+  {
     Serial.println(F("Button pressed"));
   }
-
-
-  tftDisplay.print("Text rotation", 0, 0);
-  tftDisplay.setColor(0, 0, 255);
-  tftDisplay.print("0 degrees", 0, 16, 0);
-  tftDisplay.print("90 degrees", 319, 0, 90);
-  tftDisplay.print("180 degrees", 319, 239, 180);
-  tftDisplay.print("270 degrees", 0, 239, 270);
-
-
- 
-  // put your main code here, to run repeatedly:
 }

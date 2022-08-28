@@ -1,24 +1,23 @@
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
+#include <Joystick.h>
 
 #define VrX A7
 #define VrY A6
 #define Bttn 22
-#define BLACK 0x0000
-#define BLUE 0x001F
-#define RED 0xF800
-#define GREEN 0x07E0
-#define CYAN 0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW 0xFFE0
-#define WHITE 0xFFFF
+
+
 
 MCUFRIEND_kbv tft;
+
+Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 void setup()
 {
   // put your setup code here, to run once:
+  pinMode(25, OUTPUT);
+  digitalWrite(25, HIGH);
   Serial.begin(9600);
   pinMode(Bttn, INPUT_PULLUP);
   // Reading TFT ID:
@@ -26,15 +25,15 @@ void setup()
   // Initializing TFT display:
   tft.begin(ID);
   // Fill TFT Screen with a color:
-  tft.fillScreen(BLACK);
+  tft.fillScreen(TFT_BLACK);
 }
 
 void loop()
 {
-  int vals[2];
+  float vals[2];
 
-  vals[0] = analogRead(VrX);
-  vals[1] = analogRead(VrY);
+  vals[0] = sticky.getAxes().x;
+  vals[1] = sticky.getAxes().y;
 
   Serial.print(F("X: "));
   Serial.println(vals[0]);
@@ -44,10 +43,13 @@ void loop()
 
   delay(50);
 
-  bool button = (digitalRead(Bttn) == LOW);
-
-  if (button)
-  {
+  if (sticky.pressed()) {
     Serial.println(F("Button pressed"));
+
+    for(int i = 0; i < 0xFFFF; i++) {
+      tft.fillScreen(i);
+      delay(5);
+    }
+
   }
 }

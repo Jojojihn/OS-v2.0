@@ -13,6 +13,38 @@ MCUFRIEND_kbv tft;
 
 Joystick sticky = Joystick(VrX, VrY, Bttn);
 
+
+void renderAnalogStick(Joystick &stick) {
+    struct Point {
+      int x;
+      int y;
+    };
+    
+    tft.fillScreen(TFT_BLACK);
+    Point size = {tft.width(), tft.height()};
+    Point center = {(size.x / 2), (size.y / 2)};
+    
+    //Center dot
+    tft.fillCircle(center.x, center.y, 2, TFT_BLUE);
+
+    //Outer Ring
+    int smallestSize = min(size.x, size.y);
+    int outerRingRad = (smallestSize / 2) - 10;
+    tft.drawCircle(center.x, center.y, outerRingRad, TFT_WHITE);
+
+    //Deadzone Ring
+    int deadZoneRingRad = outerRingRad * stick.getDeadzone();
+    tft.drawCircle(center.x, center.y, deadZoneRingRad, TFT_RED);
+
+    //Stick
+    Point stickPos = {
+      center.x + outerRingRad * (-stick.getAxes().x),
+      center.y + outerRingRad * (-stick.getAxes().y)
+    };
+    tft.fillCircle(stickPos.x, stickPos.y, 10, TFT_BLUE);
+    
+}
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -27,6 +59,8 @@ void setup()
   // Fill TFT Screen with a color:
   tft.fillScreen(TFT_BLACK);
 }
+
+
 
 void loop()
 {
@@ -43,13 +77,24 @@ void loop()
 
   delay(50);
 
+
+
   if (sticky.pressed()) {
     Serial.println(F("Button pressed"));
 
-    for(int i = 0; i < 0xFFFF; i++) {
-      tft.fillScreen(i);
-      delay(5);
-    }
+    Joystick::Axes prev = sticky.getAxes();
+    renderAnalogStick(sticky);
+    while(!sticky.pressed()) {
 
+      if(prev.x == sticky.getAxes().x && prev.y == sticky.getAxes().y) {
+        continue;
+      }
+
+      renderAnalogStick(sticky);
+      
+    }
   }
 }
+
+
+

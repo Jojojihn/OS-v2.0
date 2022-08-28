@@ -50,6 +50,14 @@ Joystick::Axes Joystick::getAxes() {
     return axes;
 }
 
+void Joystick::setDeadzone(float deadzone) {
+    this->deadzone = deadzone;
+}
+
+float Joystick::getDeadzone() {
+    return deadzone;
+}
+
 
 ///Updates the axes variable with the latest data (Respects deadzone)
 void Joystick::updateAxes() {
@@ -61,6 +69,8 @@ void Joystick::updateAxes() {
     //Get Value between 0 and 511 for each direction
     if(x >= 512) {
         x -= 512;
+    } else if(x <= 511) {
+        x = 511 - x;
         x = -x;
     }
     //Value between -1 and 1 of how much right / left respectively
@@ -68,6 +78,8 @@ void Joystick::updateAxes() {
 
     if(y >= 512) {
         y -= 512;
+    } else if(y <= 511) {
+        y = 511 - y;
         y = -y;
     }
     //Value between -1 and 1 of how much down / up respectively
@@ -75,7 +87,7 @@ void Joystick::updateAxes() {
 
     //Calculate amplitude
     float amplitude = sqrt(square(tempAxes.x) + square(tempAxes.y));
-
+    
     if(amplitude <= deadzone) {
         tempAxes = {0,0};
     }
@@ -83,5 +95,7 @@ void Joystick::updateAxes() {
     axes = tempAxes;
 
 }
+
+
 
 

@@ -61,6 +61,20 @@ class Joystick {
          */
         Axes getAxes();
 
+        /**
+         * Set the highest amplitude of the stick under which it does not report values.
+         * This is useful to compensate for stick drift.
+         * 
+         * 
+         * @param deadzone Deadzone between 0 and 1 
+         */
+        void setDeadzone(float deadzone);
+
+        /**
+         * Get the deadzone amplitude
+         */
+        float getDeadzone();
+
     private:
         Axes axes;
 

@@ -28,30 +28,49 @@ void renderAnalogStick(Joystick &stick) {
       int x;
       int y;
     };
+
     
     tft.fillScreen(TFT_WHITE);
     Point size = {tft.width(), tft.height()};
     Point center = {(size.x / 2), (size.y / 2)};
     
-    //Center dot
-    tft.fillCircle(center.x, center.y, 2, TFT_RED);
+    Joystick::Axes prev = Joystick::Axes{-2, -2};
+    Point drawn = {-1,-1};
 
-    //Outer Ring
-    int smallestSize = min(size.x, size.y);
-    int outerRingRad = (smallestSize / 2) - 10;
-    tft.drawCircle(center.x, center.y, outerRingRad, TFT_BLACK);
+    while(!sticky.pressed()) {
+      if(prev.x == stick.getAxes().x && prev.y == stick.getAxes().y) {
+        delay(5);
+        continue;
+      }
 
-    //Deadzone Ring
-    int deadZoneRingRad = outerRingRad * stick.getDeadzone();
-    tft.drawCircle(center.x, center.y, deadZoneRingRad, TFT_RED);
+      if(drawn.x != -1) {
+        tft.fillCircle(drawn.x, drawn.y, 10, TFT_WHITE);
+      }
+      
+      //Center dot
+      tft.fillCircle(center.x, center.y, 2, TFT_RED);
 
-    //Stick
-    Point stickPos = {
-      center.x + outerRingRad * (-stick.getAxes().x),
-      center.y + outerRingRad * (-stick.getAxes().y)
-    };
-    tft.fillCircle(stickPos.x, stickPos.y, 10, TFT_BLUE);
+      //Outer Ring
+      int smallestSize = min(size.x, size.y);
+      int outerRingRad = (smallestSize / 2) - 10;
+      tft.drawCircle(center.x, center.y, outerRingRad, TFT_BLACK);
+
+      //Deadzone Ring
+      int deadZoneRingRad = outerRingRad * stick.getDeadzone();
+      tft.drawCircle(center.x, center.y, deadZoneRingRad, TFT_RED);
+
+      //Stick
+      Joystick::Axes axes = stick.getAxes();
+      Point stickPos = {
+        center.x + outerRingRad * (-axes.x),
+        center.y + outerRingRad * (-axes.y)
+      };
+     
+      tft.fillCircle(stickPos.x, stickPos.y, 10, TFT_BLUE);
+      prev = axes;
+      drawn = {stickPos.x, stickPos.y};
     
+    }
 }
 
 void setup()
@@ -68,11 +87,13 @@ void setup()
   tft.begin(ID);
 
    // Fill TFT Screen with a color:
+  tft.fillScreen(TFT_BLACK);
 #else
   tft.begin();
+  tft.fillScreen(TFT_WHITE);
 #endif
 
- tft.fillScreen(TFT_BLACK);
+
  
 }
 
@@ -100,16 +121,7 @@ void loop()
 
     Joystick::Axes prev = sticky.getAxes();
     renderAnalogStick(sticky);
-    while(!sticky.pressed()) {
-
-      if(prev.x == sticky.getAxes().x && prev.y == sticky.getAxes().y) {
-        continue;
-      }
-
-      prev = sticky.getAxes();
-      renderAnalogStick(sticky);
-      
-    }
+    
   }
 }
 

@@ -3,16 +3,25 @@
 #include <MCUFRIEND_kbv.h>
 #include <Joystick.h>
 
+//Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
+//#define Simulide
+
+#ifdef Simulide
+#include <Adafruit_ILI9341.h>
+#define TFT_CS 8
+#define TFT_RST 9
+#define TFT_DC 10
+#define TFT_MOSI 11
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, 13, TFT_RST);
+#else
+MCUFRIEND_kbv tft;
+#endif
+
 #define VrX A7
 #define VrY A6
 #define Bttn 22
 
-
-
-MCUFRIEND_kbv tft;
-
 Joystick sticky = Joystick(VrX, VrY, Bttn);
-
 
 void renderAnalogStick(Joystick &stick) {
     struct Point {
@@ -20,17 +29,17 @@ void renderAnalogStick(Joystick &stick) {
       int y;
     };
     
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(TFT_WHITE);
     Point size = {tft.width(), tft.height()};
     Point center = {(size.x / 2), (size.y / 2)};
     
     //Center dot
-    tft.fillCircle(center.x, center.y, 2, TFT_BLUE);
+    tft.fillCircle(center.x, center.y, 2, TFT_RED);
 
     //Outer Ring
     int smallestSize = min(size.x, size.y);
     int outerRingRad = (smallestSize / 2) - 10;
-    tft.drawCircle(center.x, center.y, outerRingRad, TFT_WHITE);
+    tft.drawCircle(center.x, center.y, outerRingRad, TFT_BLACK);
 
     //Deadzone Ring
     int deadZoneRingRad = outerRingRad * stick.getDeadzone();
@@ -47,17 +56,24 @@ void renderAnalogStick(Joystick &stick) {
 
 void setup()
 {
-  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+  
   pinMode(25, OUTPUT);
   digitalWrite(25, HIGH);
-  Serial.begin(9600);
-  pinMode(Bttn, INPUT_PULLUP);
+#ifndef Simulide
   // Reading TFT ID:
   uint16_t ID = tft.readID();
   // Initializing TFT display:
   tft.begin(ID);
-  // Fill TFT Screen with a color:
-  tft.fillScreen(TFT_BLACK);
+
+   // Fill TFT Screen with a color:
+#else
+  tft.begin();
+#endif
+
+ tft.fillScreen(TFT_BLACK);
+ 
 }
 
 
@@ -90,6 +106,7 @@ void loop()
         continue;
       }
 
+      prev = sticky.getAxes();
       renderAnalogStick(sticky);
       
     }

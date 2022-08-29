@@ -38,7 +38,7 @@ void renderAnalogStick(Joystick &stick) {
     Point drawn = {-1,-1};
 
     while(!sticky.pressed()) {
-      if(prev.x == stick.getAxes().x && prev.y == stick.getAxes().y) {
+      if(abs(prev.x - stick.getAxes().x) < 0.02 && abs(prev.y - stick.getAxes().y) < 0.02) {
         delay(5);
         continue;
       }
@@ -69,7 +69,7 @@ void renderAnalogStick(Joystick &stick) {
       tft.fillCircle(stickPos.x, stickPos.y, 10, TFT_BLUE);
       prev = axes;
       drawn = {stickPos.x, stickPos.y};
-    
+      delay(80);
     }
 }
 
@@ -119,7 +119,7 @@ void loop()
   if (sticky.pressed()) {
     Serial.println(F("Button pressed"));
 
-    Joystick::Axes prev = sticky.getAxes();
+    sticky.setDeadzone(0.5);
     renderAnalogStick(sticky);
     
   }

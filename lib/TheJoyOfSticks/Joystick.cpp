@@ -90,6 +90,10 @@ void Joystick::updateAxes() {
     
     if(amplitude <= deadzone) {
         tempAxes = {0,0};
+    } else if(amplitude > 1) {
+        //Stick sometimes exceeds amplitude of 1 somehow, in that case shorten to amplitude 1
+        tempAxes.x = tempAxes.x / amplitude;
+        tempAxes.y = tempAxes.y / amplitude;
     }
 
     axes = tempAxes;

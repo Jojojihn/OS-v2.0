@@ -2,9 +2,12 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 #include <Joystick.h>
+#include <img/sleep_ico.c>
+#include <LowPower.h>
+
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
-//#define Simulide
+#define Simulide
 
 #ifdef Simulide
 #include <Adafruit_ILI9341.h>
@@ -20,6 +23,8 @@ MCUFRIEND_kbv tft;
 #define VrX A7
 #define VrY A6
 #define Bttn 22
+
+#define SHUTDOWN_BTTN 18
 
 Joystick sticky = Joystick(VrX, VrY, Bttn);
 
@@ -65,19 +70,52 @@ void renderAnalogStick(Joystick &stick) {
         center.x + outerRingRad * (-axes.x),
         center.y + outerRingRad * (-axes.y)
       };
-     
+
       tft.fillCircle(stickPos.x, stickPos.y, 10, TFT_BLUE);
       prev = axes;
       drawn = {stickPos.x, stickPos.y};
+      
+      //Ticks
+      int startRad = outerRingRad - 4;
+      int endRad = outerRingRad + 4;
+      for(float i = 0; i < 360; i += 90) {
+        Point startPoint;
+        startPoint.x = center.x + (sin(radians(i)) * startRad);
+        startPoint.y = center.y - (cos(radians(i)) * startRad);
+
+        Point endPoint;
+        endPoint.x = center.x + (sin(radians(i)) * endRad);
+        endPoint.y = center.y - (cos(radians(i)) * endRad);
+
+        tft.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, TFT_BLACK);
+        
+      }
+
       delay(80);
     }
+
+    tft.fillScreen(TFT_BLACK);
+}
+
+void wake() {}
+void shutdown() {
+  int pos[] = {0,0};
+  pos[0] = tft.width() / 2 - sleep_ico_width / 2;
+  pos[1] = tft.height() / 2 - sleep_ico_height / 2;
+  tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
+
+  attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
+  LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
+  detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
+  
 }
 
 void setup()
 {
   Serial.begin(9600);
 
-  
+  pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
+
   pinMode(25, OUTPUT);
   digitalWrite(25, HIGH);
 #ifndef Simulide
@@ -90,10 +128,10 @@ void setup()
   tft.fillScreen(TFT_BLACK);
 #else
   tft.begin();
-  tft.fillScreen(TFT_WHITE);
+  tft.print("Ready");
 #endif
 
-
+  
  
 }
 
@@ -114,14 +152,15 @@ void loop()
 
   delay(50);
 
-
-
+  if(digitalRead(SHUTDOWN_BTTN) == LOW) {
+    shutdown();
+  }
+  
   if (sticky.pressed()) {
     Serial.println(F("Button pressed"));
 
-    sticky.setDeadzone(0.5);
-    renderAnalogStick(sticky);
-    
+    sticky.setDeadzone(0.3);
+    renderAnalogStick(sticky); 
   }
 }
 

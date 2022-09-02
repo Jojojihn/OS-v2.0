@@ -4,7 +4,7 @@
 #include <Joystick.h>
 #include <img/sleep_ico.c>
 #include <LowPower.h>
-
+#include <bootUp.h>
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
 //#define Simulide
@@ -125,9 +125,8 @@ void setup()
   uint16_t ID = tft.readID();
   // Initializing TFT display:
   tft.begin(ID);
-
-   // Fill TFT Screen with a color:
-  tft.fillScreen(TFT_BLUE);
+  bootUp(tft);
+  tft.setRotation(2);
 #else
   tft.begin();
   tft.print("Ready");

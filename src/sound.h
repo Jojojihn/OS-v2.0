@@ -8,8 +8,8 @@
 #define SpkL 50
 #define SpkR 52
 
-#define mp3TX 23
-#define mp3RX 25
+#define mp3TX 52
+#define mp3RX 53
 
 /**The speaker variables define how much that speaker is used**/
 void playSound(bool rSpeaker, bool lSpeaker, float pitch, int length){
@@ -25,6 +25,7 @@ void playSound(bool rSpeaker, bool lSpeaker, float pitch, int length){
 
 void playRasputin() {
   SoftwareSerial mySoftwareSerial(mp3RX, mp3TX); // RX, TX
+  mySoftwareSerial.begin(9600);
   DFRobotDFPlayerMini myDFPlayer;
 
   if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.

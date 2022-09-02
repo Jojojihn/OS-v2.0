@@ -7,7 +7,7 @@
 #include <bootUp.h>
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
-#define Simulide
+//#define Simulide
 
 #ifdef Simulide
 #include <Adafruit_ILI9341.h>

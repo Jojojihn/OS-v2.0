@@ -23,10 +23,10 @@ MCUFRIEND_kbv tft;
 #define VrX A7
 #define VrY A6
 #define Bttn 22
+Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 #define SHUTDOWN_BTTN 20
 
-Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 void renderAnalogStick(Joystick &stick) {
     struct Point {
@@ -97,6 +97,40 @@ void renderAnalogStick(Joystick &stick) {
     tft.fillScreen(TFT_BLACK);
 }
 
+void drawRleRGBBitmap(int posX, int posY, const uint16_t *colors, const uint8_t *counts, const uint8_t *mask, uint16_t width, uint16_t height) {
+  int count = 0; //The amount of times a color needs to be drawn
+  int countIndex = 0;
+
+  int currentColor = 0;
+  int colorIndex = 0;
+
+  uint8_t currentMask = 0;
+  tft.startWrite();
+  for(uint16_t y = 0; y < height; y++) {
+    for(uint8_t x = 0; x < width; x++) {
+      if(count == 0) {
+        count = pgm_read_byte(&counts[countIndex]);
+        countIndex++;
+        currentColor = pgm_read_word(&colors[colorIndex]);
+        colorIndex++;
+      }
+      count--;
+
+      if(x & 7)
+        currentMask <<= 1;
+      else
+        currentMask = pgm_read_byte(&mask[y * ((width + 7) / 8) + x / 8]);
+        
+      if (currentMask & 0x80) {
+        tft.writePixel(posX + x, posY + y, currentColor);
+      }
+     
+    }
+  }
+  tft.endWrite();
+}
+
+
 void wake() {}
 void shutdown() {
   int pos[] = {0,0};
@@ -104,7 +138,9 @@ void shutdown() {
   pos[1] = tft.height() / 2 - sleep_ico_rain_height / 2;
 
   //tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
-  tft.drawRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  //tft.drawRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  drawRleRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits_colors, sleep_ico_rain_bits_count, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  
   
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
@@ -117,6 +153,7 @@ void shutdown() {
 
 void setup()
 {
+  //sticky.is
   Serial.begin(9600);
 
   pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
@@ -128,12 +165,13 @@ void setup()
   // Initializing TFT display:
   tft.begin(ID);
   tft.setRotation(3);
+
   bootUp(tft);
 #else
   tft.begin();
   tft.print("Ready");
 #endif
-
+  
   
  
 }
@@ -142,17 +180,6 @@ void setup()
 
 void loop()
 {
-  float vals[2];
-
-  vals[0] = sticky.getAxes().x;
-  vals[1] = sticky.getAxes().y;
-
-  /*Serial.print(F("X: "));
-  Serial.println(vals[0]);
-
-  Serial.print(F("Y: "));
-  Serial.println(vals[1]);*/
-
   delay(50);
 
   if(digitalRead(SHUTDOWN_BTTN) == LOW) {
@@ -161,7 +188,6 @@ void loop()
   
   if (sticky.pressed()) {
     Serial.println(F("Button pressed"));
-
     sticky.setDeadzone(0.3);
     renderAnalogStick(sticky); 
   }

@@ -6,7 +6,7 @@
 #include <color.h>
 #include <sound.h>
 
-void bootUp(MCUFRIEND_kbv & display){
+void bootUp(Adafruit_GFX & display){
     display.fillScreen(TFT_DARKGREY);
     display.fillCircle(display.width()/2, display.height()/2, (display.height()/2)-10, TFT_PRIMARY_COLOR);
     display.fillCircle(display.width()/2, display.height()/2, (display.height()/2)-30, TFT_DARKGREY);

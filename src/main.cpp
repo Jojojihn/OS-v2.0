@@ -7,7 +7,7 @@
 
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
-#define Simulide
+//#define Simulide
 
 #ifdef Simulide
 #include <Adafruit_ILI9341.h>
@@ -23,8 +23,10 @@ MCUFRIEND_kbv tft;
 #define VrX A7
 #define VrY A6
 #define Bttn 22
+#define SpkL 50
+#define SpkR 52
 
-#define SHUTDOWN_BTTN 18
+#define SHUTDOWN_BTTN 20
 
 Joystick sticky = Joystick(VrX, VrY, Bttn);
 
@@ -107,7 +109,11 @@ void shutdown() {
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
-  
+  while(digitalRead(SHUTDOWN_BTTN)==LOW);
+}
+/**The speaker variables define how much that speaker is used**/
+void playSound(bool rSpeaker, bool lSpeaker, int pitch, int length){
+  if(rSpeaker)
 }
 
 void setup()
@@ -115,7 +121,6 @@ void setup()
   Serial.begin(9600);
 
   pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
-
   pinMode(25, OUTPUT);
   digitalWrite(25, HIGH);
 #ifndef Simulide
@@ -125,7 +130,7 @@ void setup()
   tft.begin(ID);
 
    // Fill TFT Screen with a color:
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_BLUE);
 #else
   tft.begin();
   tft.print("Ready");

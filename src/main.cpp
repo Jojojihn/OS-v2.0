@@ -23,8 +23,6 @@ MCUFRIEND_kbv tft;
 #define VrX A7
 #define VrY A6
 #define Bttn 22
-#define SpkL 50
-#define SpkR 52
 
 #define SHUTDOWN_BTTN 20
 
@@ -110,11 +108,10 @@ void shutdown() {
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
   while(digitalRead(SHUTDOWN_BTTN)==LOW);
+  tft.fillScreen(TFT_BLUE);
 }
-/**The speaker variables define how much that speaker is used**/
-void playSound(bool rSpeaker, bool lSpeaker, int pitch, int length){
-  if(rSpeaker)
-}
+
+
 
 void setup()
 {

@@ -10,8 +10,11 @@
 #include <Arduino.h>
 
 
+
 class Joystick {
     public: 
+       
+
         /**
          * Construct a new Joystick (Analog Stick) object.
          * Make sure to use pins capable of reading analog input for the Axes.
@@ -26,12 +29,30 @@ class Joystick {
         /**
          * Contains x and y values for the joystick axes
          * Values range between -1 and 1
-         * Left/Down being -1 and Up/Right being 1
+         * Right/Down being -1 and Up/Left being 1
       	 */
         struct Axes {
           float x;
           float y;
+
+
+          /**
+           * Get the amplitude of the stick
+           * 
+           * @return float Number between 0 (center) and 1 (edge)
+           */
+          float getAmplitude();
+
+          /**
+           * Get the normalized form of this direction. The result
+           * is a direction with an amplitude of 1.
+           * 
+           * @return The Axes object with normalized parameters
+           */
+          Axes normalized();
         };
+
+
 
         /**
          * Whether the button has been pressed (Off -> On)
@@ -72,8 +93,20 @@ class Joystick {
 
         /**
          * Get the deadzone amplitude
+         * 
+         * @return The deadzone value between 0 and 1
          */
         float getDeadzone();
+
+        /**
+         * Whether the Joystick is pointing in roughly the same direction as the 
+         * given direcion
+         * 
+         * @param direction The direction to compare to
+         * @param maxAngle Maximum allowed deviation angle in degrees
+         * @return true When the stick is within the angle margin
+         */
+        bool isRoughly(Axes direction, float maxAngle = 15);
 
     private:
         Axes axes;
@@ -96,6 +129,8 @@ class Joystick {
         Joystick();
   
 };
+
+
 
 
 

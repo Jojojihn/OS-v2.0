@@ -15,6 +15,20 @@ Joystick::Joystick(byte axisX, byte axisY, byte button, float deadzone) :
     deadzone = max(min(0, deadzone), 0.95);
 }
 
+float Joystick::Axes::getAmplitude() {
+    return sqrt(square(x) + square(y));
+}
+
+Joystick::Axes Joystick::Axes::normalized() {
+    float amplitude = getAmplitude();
+    return Axes{x / amplitude, y / amplitude};
+}
+
+const Joystick::Axes UP = Joystick::Axes{0,1};
+const Joystick::Axes DOWN = Joystick::Axes{0,-1};
+const Joystick::Axes LEFT = Joystick::Axes{1,0};
+const Joystick::Axes RIGHT = Joystick::Axes{-1,0};
+
 bool Joystick::pressed() {
     updateButtonState();
 
@@ -58,6 +72,15 @@ float Joystick::getDeadzone() {
     return deadzone;
 }
 
+bool Joystick::isRoughly(Joystick::Axes direction, float maxAngle) {
+    Joystick::Axes vec1 = direction.normalized();
+    Joystick::Axes vec2 = getAxes();
+
+    float dotProduct = vec1.x * vec2.x + vec1.y * vec2.y;
+    float angle = degrees(acos(dotProduct));
+
+    return angle <= maxAngle;
+}
 
 ///Updates the axes variable with the latest data (Respects deadzone)
 void Joystick::updateAxes() {

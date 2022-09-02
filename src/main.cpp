@@ -2,7 +2,7 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 #include <Joystick.h>
-#include <img/sleep_ico.c>
+#include <img/sleep_ico_rain.c>
 #include <LowPower.h>
 #include <bootUp.h>
 
@@ -100,15 +100,17 @@ void renderAnalogStick(Joystick &stick) {
 void wake() {}
 void shutdown() {
   int pos[] = {0,0};
-  pos[0] = tft.width() / 2 - sleep_ico_width / 2;
-  pos[1] = tft.height() / 2 - sleep_ico_height / 2;
-  tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
+  pos[0] = tft.width() / 2 - sleep_ico_rain_width / 2;
+  pos[1] = tft.height() / 2 - sleep_ico_rain_height / 2;
 
+  //tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
+  tft.drawRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
   while(digitalRead(SHUTDOWN_BTTN)==LOW);
-  tft.fillScreen(TFT_BLUE);
+  
 }
 
 

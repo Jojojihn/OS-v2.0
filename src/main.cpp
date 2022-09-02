@@ -125,8 +125,8 @@ void setup()
   uint16_t ID = tft.readID();
   // Initializing TFT display:
   tft.begin(ID);
+  tft.setRotation(3);
   bootUp(tft);
-  tft.setRotation(2);
 #else
   tft.begin();
   tft.print("Ready");
@@ -145,11 +145,11 @@ void loop()
   vals[0] = sticky.getAxes().x;
   vals[1] = sticky.getAxes().y;
 
-  Serial.print(F("X: "));
+  /*Serial.print(F("X: "));
   Serial.println(vals[0]);
 
   Serial.print(F("Y: "));
-  Serial.println(vals[1]);
+  Serial.println(vals[1]);*/
 
   delay(50);
 

@@ -101,7 +101,7 @@ void renderAnalogStick(Joystick &stick) {
 /**
  * Draw an RLE encoded RGB565 Bitmap.
  * 
- * Run length encoding stores stores a count followed by the color to
+ * Run length encoding stores a count followed by the color to
  * specify how many times in a row the color needs to be drawn (how long it "runs").
  * In this implementation counts and color are separated into two arrays.
  * 

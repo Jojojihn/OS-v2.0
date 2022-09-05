@@ -2,7 +2,7 @@
     "name": "The Joy Of Sticks",
     "version": "0.1.0-2022.08.28",
     "description": "Get easy and fast input from your Analog Stick module",
-    "keywords": "analog stick, joystick, input, device, hardware",
+    "keywords": "analog stick, joystick, input, device, hardware, button, gamepad, controller, stick",
     "authors":
     [
       {

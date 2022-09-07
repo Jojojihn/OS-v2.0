@@ -43,11 +43,12 @@ void renderAnalogStick(Joystick &stick) {
     Point drawn = {-1,-1};
 
     while(!sticky.pressed()) {
+      //Don't redraw when the position didn't change (with some margin)
       if(abs(prev.x - stick.getAxes().x) < 0.02 && abs(prev.y - stick.getAxes().y) < 0.02) {
         delay(5);
         continue;
       }
-
+      //Clear previous stick circle
       if(drawn.x != -1) {
         tft.fillCircle(drawn.x, drawn.y, 10, TFT_WHITE);
       }
@@ -97,31 +98,57 @@ void renderAnalogStick(Joystick &stick) {
     tft.fillScreen(TFT_BLACK);
 }
 
+/**
+ * Draw an RLE encoded RGB565 Bitmap.
+ * 
+ * Run length encoding stores a count followed by the color to
+ * specify how many times in a row the color needs to be drawn (how long it "runs").
+ * In this implementation counts and color are separated into two arrays.
+ * 
+ * @param posX X position of top left pixel
+ * @param posY Y position of top left pixel
+ * @param colors Array of RGB565 colors
+ * @param counts Array of counts corresponding to the colors
+ * @param mask 1 Bit per pixel mask, set bit means opaque
+ * @param width width of the image
+ * @param height height of the image
+ */
 void drawRleRGBBitmap(int posX, int posY, const uint16_t *colors, const uint8_t *counts, const uint8_t *mask, uint16_t width, uint16_t height) {
   int count = 0; //The amount of times a color needs to be drawn
-  int countIndex = 0;
+  int countIndex = 0; //Index into the count array
 
-  int currentColor = 0;
-  int colorIndex = 0;
+  int currentColor = 0; //The color currently being drawn
+  int colorIndex = 0; //Index into the color array
+
+  bool doDraw = true; //Used for masking
+  uint8_t maskCount = 0; //How many pixels until the mask switches (Starts with unset)
+  int maskIndex = 0;
 
   uint8_t currentMask = 0;
   tft.startWrite();
   for(uint16_t y = 0; y < height; y++) {
     for(uint8_t x = 0; x < width; x++) {
-      if(count == 0) {
-        count = pgm_read_byte(&counts[countIndex]);
+      if(count == 0) { //When count is 0 we need to load the next color and how many times it needs to be drawn
+        count = pgm_read_byte(&counts[countIndex]); //Next color for this many pixels
         countIndex++;
-        currentColor = pgm_read_word(&colors[colorIndex]);
+        currentColor = pgm_read_word(&colors[colorIndex]); //Next color is this
         colorIndex++;
       }
-      count--;
-
-      if(x & 7)
-        currentMask <<= 1;
-      else
+      count--;//decrement count with every pixel
+  
+      while(maskCount == 0) {
+        doDraw = !doDraw;
+        maskCount = pgm_read_byte(&mask[maskIndex]);
+        maskIndex++;
+      } 
+      maskCount--;
+      /*
+      if(x & 7) //If the current mask byte still has more bits to be read
+        currentMask <<= 1; //Move the next bit into the mask position
+      else //Otherwise next byte needs to be read from mask array
         currentMask = pgm_read_byte(&mask[y * ((width + 7) / 8) + x / 8]);
-        
-      if (currentMask & 0x80) {
+      */
+      if(doDraw) { //Only draw if not masked away
         tft.writePixel(posX + x, posY + y, currentColor);
       }
      
@@ -139,7 +166,7 @@ void shutdown() {
 
   //tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
   //tft.drawRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
-  drawRleRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits_colors, sleep_ico_rain_bits_count, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  drawRleRGBBitmap(pos[0], pos[1], sleep_icon_rain_colors_new, sleep_icon_rain_counts_new, sleep_ico_RLE_mask, sleep_ico_rain_width, sleep_ico_rain_height);
   
   
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
@@ -165,16 +192,13 @@ void setup()
   // Initializing TFT display:
   tft.begin(ID);
   tft.setRotation(3);
-
-  bootUp(tft);
+  bootUp(tft); 
 #else
   tft.begin();
   tft.print("Ready");
 #endif
+
   
-  playRasputin();
-  
- 
 }
 
 

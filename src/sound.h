@@ -5,8 +5,8 @@
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
 
-#define mp3TX 52
-#define mp3RX 53
+#define mp3TX A9
+#define mp3RX A10
 
 DFRobotDFPlayerMini myDFPlayer;
 

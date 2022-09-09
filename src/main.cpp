@@ -23,6 +23,7 @@ MCUFRIEND_kbv tft;
 #define VrX A7
 #define VrY A6
 #define Bttn 22
+#define RandomPin A15
 Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 #define SHUTDOWN_BTTN 20
@@ -166,14 +167,13 @@ void shutdown() {
 
   //tft.drawXBitmap(pos[0],pos[1], sleep_ico_bits, sleep_ico_width, sleep_ico_height, TFT_LIGHTGREY);
   //tft.drawRGBBitmap(pos[0], pos[1], sleep_ico_rain_bits, sleep_ico_rain_bits_mask, sleep_ico_rain_width, sleep_ico_rain_height);
+  tft.fillScreen(TFT_BLACK);
   drawRleRGBBitmap(pos[0], pos[1], sleep_icon_rain_colors_new, sleep_icon_rain_counts_new, sleep_ico_RLE_mask, sleep_ico_rain_width, sleep_ico_rain_height);
-  
-  
+  stopMP3();
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
   while(digitalRead(SHUTDOWN_BTTN)==LOW);
-  
 }
 
 
@@ -182,7 +182,7 @@ void setup()
 {
   //sticky.is
   Serial.begin(9600);
-
+  randomSeed(analogRead(RandomPin));
   pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
   pinMode(25, OUTPUT);
   digitalWrite(25, HIGH);
@@ -197,7 +197,6 @@ void setup()
   tft.begin();
   tft.print("Ready");
 #endif
-
   
 }
 

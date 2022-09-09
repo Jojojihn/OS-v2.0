@@ -1,0 +1,14 @@
+{
+    "name": "No Switches?",
+    "version": "0.1.0-2022.09.09",
+    "description": "Easy button library",
+    "keywords": "input, device, hardware, button, gamepad, controller",
+    "authors":
+    [
+      {
+        "name": "Jatoxo",
+        "url": "https://github.com/Jatoxo"
+      }
+    ]
+   
+  }

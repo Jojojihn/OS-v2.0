@@ -12,7 +12,6 @@ void bootUp(Adafruit_GFX & display){
     display.fillCircle(display.width()/2, display.height()/2, (display.height()/2)-30, TFT_DARKGREY);
     display.fillRect(display.width()/2, (display.height()/2)-((display.height()/3)/2), display.width()/2, display.height()/3, TFT_DARKGREY);
     setupMP3();
-    delay(2000);
 }
 
 #endif

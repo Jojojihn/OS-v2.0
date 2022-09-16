@@ -31,7 +31,7 @@ void setupMP3(){
   myDFPlayer.volume(10);
 }
 /**
- * @brief Plays and MP3 file with the given Idea and volume
+ * @brief Plays and MP3 file with the given Id and volume
  * 
  * @param id The ID of the MP3 file to play
  * @param volume The Volume the MP3 player uses Range:0-1 (Optional)

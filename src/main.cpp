@@ -2,6 +2,7 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 #include <Joystick.h>
+#include <NoSwitches.h>
 #include <img/sleep_ico_rain.c>
 #include <LowPower.h>
 #include <bootUp.h>
@@ -27,6 +28,8 @@ Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 #define SHUTDOWN_BTTN 20
 
+Button shutdownButton = Button(SHUTDOWN_BTTN);
+
 
 void renderAnalogStick(Joystick &stick) {
     struct Point {
@@ -42,7 +45,7 @@ void renderAnalogStick(Joystick &stick) {
     Joystick::Axes prev = Joystick::Axes{-2, -2};
     Point drawn = {-1,-1};
 
-    while(!sticky.pressed()) {
+    while(!sticky.justPressed()) {
       //Don't redraw when the position didn't change (with some margin)
       if(abs(prev.x - stick.getAxes().x) < 0.02 && abs(prev.y - stick.getAxes().y) < 0.02) {
         delay(5);
@@ -172,7 +175,8 @@ void shutdown() {
   attachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN), wake, FALLING);
   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
   detachInterrupt(digitalPinToInterrupt(SHUTDOWN_BTTN));
-  while(digitalRead(SHUTDOWN_BTTN)==LOW);
+  
+ 
   
 }
 
@@ -207,11 +211,12 @@ void loop()
 {
   delay(50);
 
-  if(digitalRead(SHUTDOWN_BTTN) == LOW) {
+  if(shutdownButton.justPressed()) {
     shutdown();
+    while(shutdownButton.isPressed());
   }
   
-  if (sticky.pressed()) {
+  if (sticky.justPressed()) {
     Serial.println(F("Button pressed"));
     sticky.setDeadzone(0.3);
     renderAnalogStick(sticky); 

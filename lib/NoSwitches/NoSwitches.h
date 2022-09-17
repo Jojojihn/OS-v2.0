@@ -1,6 +1,8 @@
 #ifndef NoSwitches_h
 #define NoSwitches_h
 
+#include <Arduino.h>
+
 //———————————No Switches?———————————
 //⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
 //⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
@@ -20,14 +22,24 @@
 class Button {
     public:
         /**
+         * Create a new button
+         * Connect the button between ground and pin
+         * This uses the internal pullup resistor
+         * Call begin() before using
+         * @param pin The pin the button is connected to
+         */
+        Button(int pin);
+
+
+        /**
          * Whether the button has been pressed (Off -> On)
          */
-        bool pressed();
+        bool justPressed();
 
         /**
          * Whether the button has been released (On -> Off)
          */
-        bool released();
+        bool justReleased();
 
         /**
          * Whether the button has changed state (On - Off or Off -> On)
@@ -37,15 +49,27 @@ class Button {
         /**
          * Whether the button is currently pressed 
          */
-        bool isButtonPressed();
+        bool isPressed();
+
+        /**
+         * Semi internal method for updating button state
+         */
+        void updateButtonState();
 
     private:
         Button();
 
+        bool initialized;
+
+        int buttonPin;
+        int activeState;
+
         bool buttonState;
         bool hasChanged;
 
-        void updateButtonState();
+        void init();
+
+        
 
 
         

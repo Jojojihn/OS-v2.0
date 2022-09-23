@@ -6,6 +6,8 @@
 #include <img/sleep_ico_rain.c>
 #include <LowPower.h>
 #include <bootUp.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
 //#define Simulide
@@ -25,12 +27,14 @@ MCUFRIEND_kbv tft;
 #define VrY A6
 #define Bttn 22
 #define RandomPin A15
+#define SS_PIN 53
+#define RST_PIN 49
 Joystick sticky = Joystick(VrX, VrY, Bttn);
 
 #define SHUTDOWN_BTTN 20
 
 Button shutdownButton = Button(SHUTDOWN_BTTN);
-
+MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 void renderAnalogStick(Joystick &stick) {
     struct Point {
@@ -184,6 +188,8 @@ void setup()
 {
   //sticky.is
   Serial.begin(9600);
+  SPI.begin();
+  mfrc522.PCD_Init();
   randomSeed(analogRead(RandomPin));
   pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
   pinMode(25, OUTPUT);
@@ -199,7 +205,10 @@ void setup()
   tft.begin();
   tft.print("Ready");
 #endif
-  
+  if(mfrc522.PCD_PerformSelfTest()){
+    Serial.print("AMOGUSSY");
+  }
+
 }
 
 
@@ -207,7 +216,13 @@ void setup()
 void loop()
 {
   delay(50);
-
+  if(mfrc522.PICC_IsNewCardPresent()){
+    Serial.print("1");
+    if(mfrc522.PICC_ReadCardSerial()){
+      Serial.print("2");
+      mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+    }
+  }
   if(shutdownButton.justPressed()) {
     shutdown();
     while(shutdownButton.isPressed());

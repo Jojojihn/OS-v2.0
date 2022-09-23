@@ -14,4 +14,9 @@ void bootUp(Adafruit_GFX & display){
     setupMP3();
 }
 
+/*Plans to change this;
+   -play some jingle when it boots up
+   -change it to render the new OS logo with some cool animation
+*/
+
 #endif

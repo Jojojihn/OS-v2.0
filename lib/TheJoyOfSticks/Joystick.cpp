@@ -2,16 +2,12 @@
 
 
 Joystick::Joystick(byte axisX, byte axisY, byte button, float deadzone) :
+    Button{button},
     axes{512,512},
     axisX(axisX),
     axisY(axisY),
-    button(button),
-    deadzone(deadzone),
-    buttonState(false),
-    hasChanged(false)
+    deadzone(deadzone)
 {
-    pinMode(button, INPUT_PULLUP);
-
     deadzone = max(min(0, deadzone), 0.95);
 }
 
@@ -29,35 +25,6 @@ const Joystick::Axes DOWN = Joystick::Axes{0,-1};
 const Joystick::Axes LEFT = Joystick::Axes{1,0};
 const Joystick::Axes RIGHT = Joystick::Axes{-1,0};
 
-bool Joystick::pressed() {
-    updateButtonState();
-
-    return hasChanged && buttonState;
-}
-
-bool Joystick::released() {
-    updateButtonState();
-    
-    return hasChanged && !buttonState;
-}
-
-bool Joystick::toggled() {
-    updateButtonState();
-
-    return hasChanged;
-}
-
-bool Joystick::isButtonPressed() {
-    updateButtonState();
-    return buttonState;
-}
-
-void Joystick::updateButtonState() {
-    bool newState = digitalRead(button) == LOW;
-    hasChanged = newState != buttonState;
-    
-    buttonState = newState;
-}
 
 Joystick::Axes Joystick::getAxes() {
     updateAxes();

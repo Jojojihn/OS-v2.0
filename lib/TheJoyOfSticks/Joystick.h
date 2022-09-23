@@ -8,10 +8,11 @@
 #define AnalogSticks_h
 
 #include <Arduino.h>
+#include <NoSwitches.h>
 
 
 
-class Joystick {
+class Joystick : public Button {
     public: 
        
 
@@ -52,29 +53,6 @@ class Joystick {
           Axes normalized();
         };
 
-
-
-        /**
-         * Whether the button has been pressed (Off -> On)
-         */
-        bool pressed();
-
-        /**
-         * Whether the button has been released (On -> Off)
-         */
-        bool released();
-
-        /**
-         * Whether the button has changed state (On - Off or Off -> On)
-         */
-        bool toggled();
-
-        /**
-         * Whether the button is currently pressed 
-         */
-        bool isButtonPressed();
-
-
         /**
          * Get the axes of the Analog Stick
          * 
@@ -113,19 +91,13 @@ class Joystick {
 
         byte axisX;
         byte axisY;
-        byte button;
 
         float deadzone;
 
-        bool buttonState;
-        bool hasChanged;
-
-        void updateButtonState();   
 
         void updateAxes();
 
-        
-
+  
         Joystick();
   
 };

@@ -11,12 +11,12 @@ void bootUp(Adafruit_GFX & display){
     display.fillCircle(display.width()/2, display.height()/2, (display.height()/2)-10, TFT_PRIMARY_COLOR);
     display.fillCircle(display.width()/2, display.height()/2, (display.height()/2)-30, TFT_DARKGREY);
     display.fillRect(display.width()/2, (display.height()/2)-((display.height()/3)/2), display.width()/2, display.height()/3, TFT_DARKGREY);
-    playSound(true, false, 1244.51, 222);
-    playSound(false, true, 622.254, 222);
-    playSound(true, false, 932.328, 333);
-    playSound(false, true, 830.609, 444);
-    playSound(true, false, 1244.51, 333);
-    playSound(false, true, 932.328, 888);
+    setupMP3();
 }
+
+/*Plans to change this;
+   -play some jingle when it boots up
+   -change it to render the new OS logo with some cool animation
+*/
 
 #endif

@@ -7,6 +7,7 @@
 
 #define mp3TX A9
 #define mp3RX A10
+#define SYSTEM_SOUNDS 1
 
 DFRobotDFPlayerMini myDFPlayer;
 
@@ -28,7 +29,7 @@ void setupMP3(){
     }
   }
   Serial.println(F("DFPlayer Mini online."));
-  myDFPlayer.volume(10);
+  myDFPlayer.volume(2);
 }
 /**
  * @brief Plays and MP3 file with the given Id and volume
@@ -37,10 +38,7 @@ void setupMP3(){
  * @param volume The Volume the MP3 player uses Range:0-1 (Optional)
  */
 void playMP3byID(int id, float volume = -1){
-  myDFPlayer.play(id);
-  if(volume!=-1){
-    myDFPlayer.volume(max(volume*30, 30));
-  }
+  myDFPlayer.playMp3Folder(id);
 }
 
 /**
@@ -82,6 +80,10 @@ void resumeMP3(){
  */
 void playAnAd(){
   myDFPlayer.advertise(1);
+}
+
+void playSystemSound(int id){
+  myDFPlayer.playFolder(SYSTEM_SOUNDS, id);
 }
 
 

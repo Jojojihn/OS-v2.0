@@ -6,6 +6,9 @@
 #include <img/sleep_ico_rain.c>
 #include <LowPower.h>
 #include <bootUp.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <login.h>
 
 //Comment/Uncomment this to switch between Simulide mode and hardware mode. Simulide uses a different Display and is used for debugging
 //#define Simulide
@@ -30,7 +33,6 @@ Joystick sticky = Joystick(VrX, VrY, Bttn);
 #define SHUTDOWN_BTTN 20
 
 Button shutdownButton = Button(SHUTDOWN_BTTN);
-
 
 void renderAnalogStick(Joystick &stick) {
     struct Point {
@@ -184,6 +186,7 @@ void setup()
 {
   //sticky.is
   Serial.begin(9600);
+  SPI.begin();
   randomSeed(analogRead(RandomPin));
   pinMode(SHUTDOWN_BTTN, INPUT_PULLUP);
   pinMode(25, OUTPUT);
@@ -199,7 +202,7 @@ void setup()
   tft.begin();
   tft.print("Ready");
 #endif
-  
+  waitForLogIn(tft);
 }
 
 
@@ -207,7 +210,6 @@ void setup()
 void loop()
 {
   delay(50);
-
   if(shutdownButton.justPressed()) {
     shutdown();
     while(shutdownButton.isPressed());
